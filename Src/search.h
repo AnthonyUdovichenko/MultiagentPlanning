@@ -21,8 +21,8 @@ class Search
     protected:
         //CODE HERE
         static double heuristic(const Node &node, const Map &map, const EnvironmentOptions &options, int algorithm, int agent_number);
-        static std::vector<Node> generateAllSuccs(Node &cur, const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, std::unordered_set<std::tuple<int, int, int>, TupleHash> &moving_agents, int agent_num);
-        SearchResult agentSearch(const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, int agent_num, std::unordered_set<std::tuple<int, int, int>, TupleHash> &moving_agents);
+        static std::vector<Node> generateAllSuccs(Node &cur, const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, std::unordered_map<std::tuple<int, int, int>, std::pair<int, int>, TupleHash> &moving_agents, int agent_num);
+        SearchResult agentSearch(const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, int agent_num, std::unordered_map<std::tuple<int, int, int>, std::pair<int, int>, TupleHash> &moving_agents);
         static int xDiff(Node &first, Node &second);
         static int yDiff(Node &first, Node &second);
         static void assignPriorities(const Map &map, const EnvironmentOptions &options, std::vector<int> &priorities);

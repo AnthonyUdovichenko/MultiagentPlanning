@@ -47,58 +47,66 @@ int argmin(const std::vector<Node> &OPEN) {
     return result;
 }
 
-std::vector<Node> Search::generateAllSuccs(Node &cur, const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, std::unordered_set<std::tuple<int, int, int>, TupleHash> &moving_agents, int agent_num) {
+std::vector<Node> Search::generateAllSuccs(Node &cur, const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, std::unordered_map<std::tuple<int, int, int>, std::pair<int, int>, TupleHash> &moving_agents, int agent_num) {
     std::vector<Node> SUCC = {};
     if (map.CellOnGrid(cur.i, cur.j - 1)) {
         if (map.CellIsTraversable(cur.i, cur.j - 1) && !moving_agents.count(std::make_tuple(cur.i, cur.j - 1, cur.time + 1))) {
-            Node add{};
-            add.i = cur.i;
-            add.j = cur.j - 1;
-            add.time = cur.time + 1;
-            add.g = cur.g + 1;
-            add.H = Search::heuristic(add, map, options, algorithm, agent_num);
-            add.F = add.g + heuristic_weight * add.H;
-            add.parent = {cur.i, cur.j};
-            SUCC.push_back(add);
+            if (!(moving_agents.count(std::make_tuple(cur.i, cur.j, cur.time + 1)) && moving_agents[std::make_tuple(cur.i, cur.j, cur.time + 1)] == std::make_pair(cur.i, cur.j - 1))) {
+                Node add{};
+                add.i = cur.i;
+                add.j = cur.j - 1;
+                add.time = cur.time + 1;
+                add.g = cur.g + 1;
+                add.H = Search::heuristic(add, map, options, algorithm, agent_num);
+                add.F = add.g + heuristic_weight * add.H;
+                add.parent = {cur.i, cur.j};
+                SUCC.push_back(add);
+            }
         }
     }
     if (map.CellOnGrid(cur.i, cur.j + 1)) {
         if (map.CellIsTraversable(cur.i, cur.j + 1) && !moving_agents.count(std::make_tuple(cur.i, cur.j + 1, cur.time + 1))) {
-            Node add{};
-            add.i = cur.i;
-            add.j = cur.j + 1;
-            add.time = cur.time + 1;
-            add.g = cur.g + 1;
-            add.H = Search::heuristic(add, map, options, algorithm, agent_num);
-            add.F = add.g + heuristic_weight * add.H;
-            add.parent = {cur.i, cur.j};
-            SUCC.push_back(add);
+            if (!(moving_agents.count(std::make_tuple(cur.i, cur.j, cur.time + 1)) && moving_agents[std::make_tuple(cur.i, cur.j, cur.time + 1)] == std::make_pair(cur.i, cur.j + 1))) {
+                Node add{};
+                add.i = cur.i;
+                add.j = cur.j + 1;
+                add.time = cur.time + 1;
+                add.g = cur.g + 1;
+                add.H = Search::heuristic(add, map, options, algorithm, agent_num);
+                add.F = add.g + heuristic_weight * add.H;
+                add.parent = {cur.i, cur.j};
+                SUCC.push_back(add);
+            }
         }
     }
     if (map.CellOnGrid(cur.i - 1, cur.j)) {
         if (map.CellIsTraversable(cur.i - 1, cur.j) && !moving_agents.count(std::make_tuple(cur.i - 1, cur.j, cur.time + 1))) {
-            Node add{};
-            add.i = cur.i - 1;
-            add.j = cur.j;
-            add.time = cur.time + 1;
-            add.g = cur.g + 1;
-            add.H = Search::heuristic(add, map, options, algorithm, agent_num);
-            add.F = add.g + heuristic_weight * add.H;
-            add.parent = {cur.i, cur.j};
-            SUCC.push_back(add);
+            if (!(moving_agents.count(std::make_tuple(cur.i, cur.j, cur.time + 1)) && moving_agents[std::make_tuple(cur.i, cur.j, cur.time + 1)] == std::make_pair(cur.i - 1, cur.j))) {
+                Node add{};
+                add.i = cur.i - 1;
+                add.j = cur.j;
+                add.time = cur.time + 1;
+                add.g = cur.g + 1;
+                add.H = Search::heuristic(add, map, options, algorithm, agent_num);
+                add.F = add.g + heuristic_weight * add.H;
+                add.parent = {cur.i, cur.j};
+                SUCC.push_back(add);
+            }
         }
     }
     if (map.CellOnGrid(cur.i + 1, cur.j)) {
         if (map.CellIsTraversable(cur.i + 1, cur.j) && !moving_agents.count(std::make_tuple(cur.i + 1, cur.j, cur.time + 1))) {
-            Node add{};
-            add.i = cur.i + 1;
-            add.j = cur.j;
-            add.time = cur.time + 1;
-            add.g = cur.g + 1;
-            add.H = Search::heuristic(add, map, options, algorithm, agent_num);
-            add.F = add.g + heuristic_weight * add.H;
-            add.parent = {cur.i, cur.j};
-            SUCC.push_back(add);
+            if (!(moving_agents.count(std::make_tuple(cur.i, cur.j, cur.time + 1)) && moving_agents[std::make_tuple(cur.i, cur.j, cur.time + 1)] == std::make_pair(cur.i + 1, cur.j))) {
+                Node add{};
+                add.i = cur.i + 1;
+                add.j = cur.j;
+                add.time = cur.time + 1;
+                add.g = cur.g + 1;
+                add.H = Search::heuristic(add, map, options, algorithm, agent_num);
+                add.F = add.g + heuristic_weight * add.H;
+                add.parent = {cur.i, cur.j};
+                SUCC.push_back(add);
+            }
         }
     }
     if (!moving_agents.count(std::make_tuple(cur.i, cur.j, cur.time + 1))) {
@@ -129,7 +137,7 @@ struct PairHash {
     }
 };
 
-SearchResult Search::agentSearch(const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, int agent_num, std::unordered_set<std::tuple<int, int, int>, TupleHash> &moving_agents)
+SearchResult Search::agentSearch(const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight, int agent_num, std::unordered_map<std::tuple<int, int, int>, std::pair<int, int>, TupleHash> &moving_agents)
 {
     unsigned int start_time = clock();
     Node start{};
@@ -155,7 +163,7 @@ SearchResult Search::agentSearch(const Map &map, const EnvironmentOptions &optio
             sresult[agent_num].pathfound = true;
             sresult[agent_num].pathlength = cur.g;
             lppath[agent_num].push_front(cur);
-            moving_agents.insert(std::make_tuple(cur.i, cur.j, cur.time));
+            moving_agents[std::make_tuple(cur.i, cur.j, cur.time)] = cur.parent;
             hppath[agent_num].push_front(cur);
             while (cur.parent != std::make_pair(-1, -1)) {
                 cur = CLOSED.find({cur.parent.first, cur.parent.second})->second;
@@ -165,7 +173,7 @@ SearchResult Search::agentSearch(const Map &map, const EnvironmentOptions &optio
                     hppath[agent_num].push_front(*lppath[agent_num].begin());
                 }
                 lppath[agent_num].push_front(cur);
-                moving_agents.insert(std::make_tuple(cur.i, cur.j, cur.time));
+                moving_agents[std::make_tuple(cur.i, cur.j, cur.time)] = cur.parent;
                 if (cur == start) {
                     hppath[agent_num].push_front(cur);
                 }
@@ -232,7 +240,7 @@ std::vector<SearchResult> Search::startSearch(ILogger *Logger, const Map &map, c
     hppath.resize(agents);
     std::vector<int> priorities(agents);
     assignPriorities(map, options, priorities);
-    std::unordered_set<std::tuple<int, int, int>, TupleHash> moving_agents;
+    std::unordered_map<std::tuple<int, int, int>, std::pair<int, int>, TupleHash> moving_agents; ///<now<x,y,time>,from<x,y>>
     for (int agent : priorities) {
         agentSearch(map, options, algorithm, heuristic_weight, agent, moving_agents);
     }
