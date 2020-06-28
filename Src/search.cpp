@@ -229,7 +229,52 @@ void Search::assignPriorities(const Map &map, const EnvironmentOptions &options,
             priorities[i] = i;
         }
     }
-    ///to implement another priority types
+    if (options.prioritytype == CN_SP_PR_RAND) {
+        std::unordered_set<int> assigned;
+        const auto GRSEED = std::chrono::system_clock::now().time_since_epoch().count();
+        std::mt19937 gen(GRSEED);
+        std::uniform_int_distribution<int> genInt(0, agents);
+        for (int i = 0; i < agents; ++i) {
+            int num = genInt(gen);
+            while (assigned.count(num)) {
+                num = genInt(gen);
+            }
+            assigned.insert(num);
+            priorities[i] = num;
+        }
+    }
+    if (options.prioritytype == CN_SP_PR_SHORT) {
+        std::vector<int> pr_to_ag(agents);
+        for (int i = 0; i < agents; ++i) {
+            pr_to_ag[i] = i;
+        }
+        std::sort(pr_to_ag.begin(), pr_to_ag.end(), [map](int a, int b) {
+            int dx_a = map.getStartX(a) - map.getGoalX(a);
+            int dx_b = map.getStartX(b) - map.getGoalX(b);
+            int dy_a = map.getStartY(a) - map.getGoalY(a);
+            int dy_b = map.getStartY(b) - map.getGoalY(b);
+            return dx_a * dx_a + dy_a * dy_a < dx_b * dx_b + dy_b * dy_b;
+        });
+        for (int i = 0; i < agents; ++i) {
+            priorities[pr_to_ag[i]] = i;
+        }
+    }
+    if (options.prioritytype == CN_SP_PR_LONG) {
+        std::vector<int> pr_to_ag(agents);
+        for (int i = 0; i < agents; ++i) {
+            pr_to_ag[i] = i;
+        }
+        std::sort(pr_to_ag.begin(), pr_to_ag.end(), [map](int a, int b) {
+            int dx_a = map.getStartX(a) - map.getGoalX(a);
+            int dx_b = map.getStartX(b) - map.getGoalX(b);
+            int dy_a = map.getStartY(a) - map.getGoalY(a);
+            int dy_b = map.getStartY(b) - map.getGoalY(b);
+            return dx_a * dx_a + dy_a * dy_a > dx_b * dx_b + dy_b * dy_b;
+        });
+        for (int i = 0; i < agents; ++i) {
+            priorities[pr_to_ag[i]] = i;
+        }
+    }
 }
 
 std::vector<SearchResult> Search::startSearch(ILogger *Logger, const Map &map, const EnvironmentOptions &options, int algorithm, int heuristic_weight)

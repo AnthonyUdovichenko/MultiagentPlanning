@@ -10,6 +10,8 @@
 #include <limits>
 #include <chrono>
 #include <unordered_set>
+#include <random>
+#include <algorithm>
 
 class Search
 {
